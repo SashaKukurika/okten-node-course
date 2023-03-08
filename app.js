@@ -1,44 +1,11 @@
-// const fs = require('node:fs');
-// const path = require("node:path");
-//
-// const readStream = fs.createReadStream(path.join('text.txt'), {highWaterMark: 128 * 128});
-// const writeStream = fs.createWriteStream(path.join(process.cwd(), 'text2.txt'))
-// readStream.on("data", (chunk)=>{
-//     writeStream.write(chunk);
-// })
-
-
 const express = require('express');
-
-const users = require('./users.json');
+const {fsReader, fsWriter} = require('./fs.services')
+const {userValidator} = require("./userValidator");
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}))
-
-// const users = [
-//     {
-//         name: 'Anton',
-//         age: 34,
-//         gender: 'male',
-//     },
-//     {
-//         name: 'Anna',
-//         age: 34,
-//         gender: 'female',
-//     },
-//     {
-//         name: 'Igor',
-//         age: 23,
-//         gender: 'male',
-//     },
-//     {
-//         name: 'Ira',
-//         age: 12,
-//         gender: 'female',
-//     },
-// ]
 
 const PORT = 5000;
 
@@ -46,49 +13,81 @@ app.listen(PORT, () => {
     console.log(`Server has been started on port: ${PORT}`)
 })
 
-app.get('/users', (req, res) => {
+app.get('/users', async (req, res) => {
+
+    const users = await fsReader();
     res.status(200).json(users);
 })
 
-app.get('/users/:userId', (req, res) => {
+app.get('/users/:userId', async (req, res) => {
+
     const {userId} = req.params;
-    res.status(200).json(users[+userId]);
-})
-app.get('/welcome', (req, res) => {
-    // console.log(req);
-    console.log('Welcome!!');
-    res.send('Welcome')
-    res.end();
+    const users = await fsReader();
+
+    const user = users.find(user => user.id === +userId);
+
+    user ? res.status(200).json(user) : res.status(422).json(`User not found`)
 })
 
-app.post('/users', (req, res) => {
-    const body = req.body;
-    users.push(body);
-    console.log(body);
+app.post('/users', async (req, res) => {
+
+    const {name, age, gender} = req.body;
+
+    userValidator(name, age, gender, res);
+
+    const users = await fsReader();
+
+    console.log(users[users.length - 1].id);
+    const newId = 1 + users[users.length-1].id;
+    const user = {
+        id: newId,
+        name,
+        age,
+        gender
+    }
+
+    users.push(user)
+    await fsWriter(users)
 
     res.status(201).json({
-        message: 'User has been created!'
+        message: 'User has been created!',
+        data: user
     })
 })
 
-app.put('/users/:userId', (req, res) => {
-    const updatedUser = req.body;
+app.put('/users/:userId', async (req, res) => {
+    const {name, age, gender} = req.body;
     const {userId} = req.params;
 
-    users[+userId] = updatedUser;
+    userValidator(name, age, gender, res);
+
+    const users = await fsReader();
+
+    const user = users.find(user => user.id === +userId);
+
+    if (!user) {
+        res.status(422).json(`User not found`)
+    }
+
+    users[userId] = {...user, ...req.body}
+
+    await fsWriter(users);
 
     res.status(200).json({
-        message: 'User has been updated',
-        data: users[+userId]
+        message: 'User has been updated'
     })
 })
 
-app.delete('/users/:userId', (req, res) => {
+app.delete('/users/:userId', async (req, res) => {
     const {userId} = req.params;
+
+    const users = await fsReader();
+
     users.splice(+userId, 1);
+
+    await fsWriter(users);
 
     res.status(203).json({
         message: 'User has been deleted',
-        // data: users[+userId-1]
     })
 })
