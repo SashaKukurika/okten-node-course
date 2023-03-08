@@ -37,8 +37,8 @@ app.post('/users', async (req, res) => {
 
     const users = await fsReader();
 
-    console.log(users[users.length - 1].id);
     const newId = 1 + users[users.length-1].id;
+
     const user = {
         id: newId,
         name,
