@@ -1,73 +1,59 @@
 import express, { Request, Response } from "express";
 import mongoose from "mongoose";
 
+import { User } from "./models/User.model";
+import { IUser } from "./types/user.types";
+
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-const users = [
-  {
-    name: "Oleh",
-    age: 19,
-    gender: "male",
-  },
-  {
-    name: "Anton",
-    age: 22,
-    gender: "female",
-  },
-  {
-    name: "Anya",
-    age: 25,
-    gender: "female",
-  },
-  {
-    name: "Elizaveta",
-    age: 35,
-    gender: "female",
-  },
-  {
-    name: "Cocos",
-    age: 70,
-    gender: "mixed",
-  },
-];
+app.get(
+  "/users",
+  async (req: Request, res: Response): Promise<Response<IUser[]>> => {
+    const users = await User.find();
 
-app.get("/users", (req: Request, res: Response) => {
-  res.json(users);
-});
+    return res.json(users);
+  }
+);
 
-app.get("/users/:userId", (req: Request, res: Response) => {
-  const { userId } = req.params;
-  const user = users[+userId];
+app.get(
+  "/users/:userId",
+  async (req: Request, res: Response): Promise<Response<IUser>> => {
+    const { userId } = req.params;
+    const user = await User.findById(userId);
 
-  res.json(user);
-});
+    return res.json(user);
+  }
+);
 
-app.post("/users", (req: Request, res: Response) => {
+app.post("/users", async (req: Request, res: Response) => {
   const body = req.body;
-  users.push(body);
+  const user = await User.create(body);
 
   res.status(201).json({
     message: "User created!",
+    data: user,
   });
 });
 
-app.put("/users/:userId", (req: Request, res: Response) => {
+app.put("/users/:userId", async (req: Request, res: Response) => {
   const { userId } = req.params;
-  users[+userId] = req.body;
+  const user = req.body;
+
+  const updatedUser = await User.updateOne({ _id: userId }, user);
 
   res.status(200).json({
     message: "User updated",
-    data: users[+userId],
+    data: updatedUser,
   });
 });
 
-app.delete("/users/:userId", (req: Request, res: Response) => {
+app.delete("/users/:userId", async (req: Request, res: Response) => {
   const { userId } = req.params;
 
-  users.splice(+userId, 1);
+  await User.deleteOne({ _id: userId });
 
   res.status(200).json({
     message: "User deleted",
