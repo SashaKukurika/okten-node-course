@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express";
+import mongoose from "mongoose";
 
 const app = express();
 
@@ -22,7 +23,7 @@ const users = [
     gender: "female",
   },
   {
-    name: "Ielizavetta",
+    name: "Elizaveta",
     age: 35,
     gender: "female",
   },
@@ -77,13 +78,9 @@ app.get("/welcome", (req: Request, res: Response) => {
   res.send("WELCOME");
 });
 
-// app.post()
-// app.put()
-// app.patch()
-// app.delete()
-
 const PORT = 5100;
 
 app.listen(PORT, () => {
+  mongoose.connect("mongodb://0.0.0.0:27017/sept-2022");
   console.log(`Server has started on PORT ${PORT} 🚀🚀🚀`);
 });
