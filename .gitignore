@@ -1,3 +1,11 @@
+# Editor directories and files
 .idea
 /okten-node-course.iml
+
+# Node artifact files
+dist/
 /node_modules
+
+# Environment variables
+.env
+.env.*

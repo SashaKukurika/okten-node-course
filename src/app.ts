@@ -1,7 +1,9 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import mongoose from "mongoose";
 
+import { configs } from "./configs/configs";
 import { userRouter } from "./routers/user.router";
+import { IError } from "./types/common.types";
 
 const app = express();
 
@@ -10,9 +12,16 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/users", userRouter);
 
-const PORT = 5100;
+app.use((err: IError, req: Request, res: Response, next: NextFunction) => {
+  const status = err.status;
 
-app.listen(PORT, () => {
-  mongoose.connect("mongodb://0.0.0.0:27017/sept-2022");
-  console.log(`Server has started on PORT ${PORT} 🚀🚀🚀`);
+  return res.status(status).json({
+    message: err.message,
+    status,
+  });
+});
+
+app.listen(configs.PORT, () => {
+  mongoose.connect(configs.DB_URL);
+  console.log(`Server has started on PORT ${configs.PORT} 🚀🚀🚀`);
 });
