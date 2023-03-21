@@ -34,10 +34,12 @@ app.post('/users', async (req, res) => {
     const {name, age, gender} = req.body;
 
     userValidator(name, age, gender, res);
-
+    let newId = 1;
     const users = await fsReader();
 
-    const newId = 1 + users[users.length-1].id;
+    if (users.length !== 0) {
+        newId = 1 + users[users.length - 1].id;
+    }
 
     const user = {
         id: newId,
@@ -82,8 +84,9 @@ app.delete('/users/:userId', async (req, res) => {
     const {userId} = req.params;
 
     const users = await fsReader();
+    const index = users.findIndex(user => user.id === +userId);
 
-    users.splice(+userId, 1);
+    users.splice(+index, 1);
 
     await fsWriter(users);
 
