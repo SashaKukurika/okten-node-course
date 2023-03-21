@@ -11,8 +11,8 @@ router.get("/", userController.getAll);
 
 router.get("/:userId", userMiddleware.getByIdAndTrow, userController.getById);
 
-router.post("/", userController.create);
+router.post("/", userMiddleware.createAndTrow, userController.create);
 
-router.put("/:userId", userController.update);
+router.put("/:userId", userMiddleware.updateAndTrow, userController.update);
 
 router.delete("/:userId", userController.delete);
