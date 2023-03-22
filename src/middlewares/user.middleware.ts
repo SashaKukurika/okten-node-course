@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from "express";
+import { isObjectIdOrHexString } from "mongoose";
 
 import { ApiErrors } from "../errors/api.errors";
 import { User } from "../models/User.model";
-import { userService } from "../services/user.service";
+import { UserValidator } from "../validators";
 
 class UserMiddleware {
-  public async getByIdAndTrow(
+  public async getByIdOrThrow(
     req: Request,
     res: Response,
     next: NextFunction
@@ -13,67 +14,66 @@ class UserMiddleware {
     try {
       const { userId } = req.params;
 
-      const user = User.findById(userId);
+      const user = await User.findById(userId);
 
       if (!user) {
-        throw new ApiErrors("User not found", 404);
+        throw new ApiErrors("User not found", 422);
       }
 
+      res.locals.user = user;
       next();
     } catch (e) {
       next(e);
     }
   }
-  public async createAndTrow(
+
+  public async isUserIdValid(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { name, age, gender } = req.body;
-
-      if (!name || name.length <= 2) {
-        throw new ApiErrors("Name must be over 2 symbol", 401);
+      if (!isObjectIdOrHexString(req.params.userId)) {
+        throw new ApiErrors("ID not valid", 400);
       }
-      if (!age || +age <= 0) {
-        throw new ApiErrors("Age must be not lower 0", 401);
-      }
-      if (!gender || (gender !== "male" && gender !== "female")) {
-        throw new ApiErrors("Gender must be male or female", 401);
-      }
-
       next();
     } catch (e) {
       next(e);
     }
   }
-  public async updateAndTrow(
+
+  public async isUserValidCreate(
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
     try {
-      const { userId } = req.params;
-      const user = req.body;
-      const { name, age, gender } = user;
-      const users = await userService.getAll();
+      const { error, value } = UserValidator.createUser.validate(req.body);
 
-      if (name.length <= 2) {
-        throw new ApiErrors("Name must be over 2 symbol", 401);
-      }
-      if (+age <= 0) {
-        throw new ApiErrors("Age must be not lower 0", 401);
-      }
-      if (gender !== "male" && gender !== "female") {
-        throw new ApiErrors("Gender must be male or female", 401);
+      if (error) {
+        throw new ApiErrors(error.message, 400);
       }
 
-      const userForUpdate = users.find((user) => user.id === +userId);
+      req.body = value;
+      next();
+    } catch (e) {
+      next(e);
+    }
+  }
 
-      if (!userForUpdate) {
-        throw new ApiErrors("User not found", 404);
+  public async isUserValidUpdate(
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void> {
+    try {
+      const { error, value } = UserValidator.updateUser.validate(req.body);
+
+      if (error) {
+        throw new ApiErrors(error.message, 400);
       }
 
+      req.body = value;
       next();
     } catch (e) {
       next(e);

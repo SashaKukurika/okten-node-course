@@ -5,14 +5,27 @@ import { userMiddleware } from "../middlewares/user.middleware";
 
 const router = Router();
 
-export const userRouter = router;
-
 router.get("/", userController.getAll);
+router.post("/", userMiddleware.isUserValidCreate, userController.create);
 
-router.get("/:userId", userMiddleware.getByIdAndTrow, userController.getById);
+router.get(
+  "/:userId",
+  userMiddleware.isUserIdValid,
+  userMiddleware.getByIdOrThrow,
+  userController.getById
+);
+router.put(
+  "/:userId",
+  userMiddleware.isUserIdValid,
+  userMiddleware.isUserValidUpdate,
+  userMiddleware.getByIdOrThrow,
+  userController.update
+);
+router.delete(
+  "/:userId",
+  userMiddleware.isUserIdValid,
+  userMiddleware.getByIdOrThrow,
+  userController.delete
+);
 
-router.post("/", userMiddleware.createAndTrow, userController.create);
-
-router.put("/:userId", userMiddleware.updateAndTrow, userController.update);
-
-router.delete("/:userId", userController.delete);
+export const userRouter = router;
