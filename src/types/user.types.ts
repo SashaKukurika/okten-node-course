@@ -5,7 +5,7 @@ export enum EGenders {
 }
 
 export interface IUser {
-  id: number;
+  _id?: string;
   email: string;
   name: string;
   password: string;
