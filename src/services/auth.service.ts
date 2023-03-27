@@ -4,6 +4,7 @@ import { ApiErrors } from "../errors";
 import { Token, User } from "../models";
 import { ITokenPair, ITokenPayload, IUser } from "../types";
 import { ICredentials } from "../types/auth.types";
+import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
 import { tokenService } from "./token.service";
 
@@ -16,6 +17,8 @@ class AuthService {
         ...body,
         password: hashedPassword,
       });
+
+      await emailService.sendMail("Gydini13@gmail.com");
     } catch (e) {
       throw new ApiErrors(e.message, e.status);
     }
