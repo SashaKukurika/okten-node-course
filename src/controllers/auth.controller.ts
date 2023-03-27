@@ -24,7 +24,9 @@ class AuthController {
       const tokenPair = await authService.login({ email, password }, user);
 
       return res.status(200).json(tokenPair);
-    } catch (e) {}
+    } catch (e) {
+      next(e);
+    }
   }
   public async refresh(
     req: Request,
@@ -37,6 +39,22 @@ class AuthController {
 
       return res.status(200).json(tokenPair);
     } catch (e) {}
+  }
+  public async changePassword(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { tokenInfo } = req.res.locals;
+      const { oldPassword, newPassword } = req.body;
+
+      await authService.changePassword(
+        tokenInfo._user_id,
+        oldPassword,
+        newPassword
+      );
+
+      res.sendStatus(200);
+    } catch (e) {
+      next(e);
+    }
   }
 }
 

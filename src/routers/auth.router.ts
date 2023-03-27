@@ -12,6 +12,12 @@ router.post(
   authController.register
 );
 router.post(
+  "/password/change",
+  userMiddleware.isValidChangePassword,
+  authMiddleware.checkAccessToken,
+  authController.changePassword
+);
+router.post(
   "/login",
   userMiddleware.isValidLogin,
   userMiddleware.getDynamicallyOrTrow("email"),
