@@ -27,8 +27,8 @@ class AuthService {
   ): Promise<ITokenPair> {
     try {
       const { password } = credentials;
-      const isMathed = await passwordService.compare(password, user.password);
-      if (!isMathed) {
+      const isMatched = await passwordService.compare(password, user.password);
+      if (!isMatched) {
         throw new ApiErrors("Invalid email or password", 400);
       }
 
