@@ -1,12 +1,13 @@
 import { Promise } from "mongoose";
 
-import { EEmailAction } from "../enums/email.enums";
+import { EEmailAction, ESmsActionEnum } from "../enums";
 import { ApiErrors } from "../errors";
 import { Token, User } from "../models";
 import { ITokenPair, ITokenPayload, IUser } from "../types";
 import { ICredentials } from "../types/auth.types";
 import { emailService } from "./email.service";
 import { passwordService } from "./password.service";
+import { smsService } from "./sms.service";
 import { tokenService } from "./token.service";
 
 class AuthService {
@@ -19,6 +20,7 @@ class AuthService {
         password: hashedPassword,
       });
 
+      await smsService.sendSms(body.phone, ESmsActionEnum.WELCOME);
       await emailService.sendMail("gydini13@gmail.com", EEmailAction.WELCOME);
     } catch (e) {
       throw new ApiErrors(e.message, e.status);
