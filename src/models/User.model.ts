@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 
 import { EGenders } from "../enums";
+import { EUserStatus } from "../enums/user-status.enum";
 
 const userSchema = new Schema(
   {
@@ -22,13 +23,15 @@ const userSchema = new Schema(
       type: String,
       enum: EGenders,
     },
-    isActivated: {
-      type: Boolean,
-      default: false,
+    status: {
+      type: String,
+      default: EUserStatus.inactive,
+      enum: EUserStatus,
     },
   },
   {
     versionKey: false,
+    timestamps: true,
   }
 );
 

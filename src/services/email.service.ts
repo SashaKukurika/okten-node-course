@@ -40,17 +40,22 @@ class EmailService {
     emailAction: EEmailAction,
     locals: Record<string, string> = {}
   ) {
-    const { templateName, subject } = allTemplates[emailAction];
-    locals.frontUrl = configs.FRONT_URL;
+    try {
+      const { templateName, subject } = allTemplates[emailAction];
+      locals.frontUrl = configs.FRONT_URL;
 
-    const html = await this.templateParser.render(templateName, locals);
+      const html = await this.templateParser.render(templateName, locals);
 
-    return this.transporter.sendMail({
-      from: "No reply",
-      to: email,
-      subject,
-      html,
-    });
+      return this.transporter.sendMail({
+        from: "No reply",
+        to: email,
+        subject,
+        html,
+      });
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.error(e.message);
+    }
   }
 }
 

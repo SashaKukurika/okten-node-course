@@ -12,4 +12,8 @@ export const allTemplates: {
       "We control your password, just follow all steps and everything will be great",
     templateName: "forgotPassword",
   },
+  [EEmailAction.ACTIVE]: {
+    subject: "Activate!",
+    templateName: "activate",
+  },
 };

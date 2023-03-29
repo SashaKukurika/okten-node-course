@@ -28,7 +28,9 @@ export class UserValidator {
 
   static loginUser = Joi.object({
     email: this.email.required(),
-    password: this.password.required(),
+  });
+  static emailValidator = Joi.object({
+    email: this.email.required(),
   });
   static changeUserPassword = Joi.object({
     oldPassword: this.password.required(),

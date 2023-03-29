@@ -1,6 +1,5 @@
 import { Promise } from "mongoose";
 
-// import { configs } from "../configs";
 import { EActionTokenType, EEmailAction, ESmsActionEnum } from "../enums";
 import { ApiErrors } from "../errors";
 import { Action, Token, User } from "../models";
@@ -125,6 +124,48 @@ class AuthService {
       const hashedPassword = await passwordService.hash(password);
 
       await User.updateOne({ _id: id }, { password: hashedPassword });
+
+      await Action.deleteMany({
+        _user_id: id,
+        tokenType: EActionTokenType.forgot,
+      });
+    } catch (e) {
+      throw new ApiErrors(e.message, e.status);
+    }
+  }
+
+  public async sendActiveToken(user: IUser): Promise<void> {
+    try {
+      const actionToken = tokenService.generateActionToken(
+        { _id: user._id },
+        EActionTokenType.activate
+      );
+
+      await Action.create({
+        _user_id: user._id,
+        actionToken,
+        tokenType: EActionTokenType.activate,
+      });
+
+      await emailService.sendMail(user.email, EEmailAction.ACTIVE, {
+        token: actionToken,
+      });
+    } catch (e) {
+      throw new ApiErrors(e.message, e.status);
+    }
+  }
+
+  public async activate(userId: string): Promise<void> {
+    try {
+      await User.updateOne(
+        { _id: userId },
+        { $set: { status: EActionTokenType.activate } }
+      );
+
+      await Action.deleteMany({
+        _user_id: userId,
+        tokenType: EActionTokenType.activate,
+      });
     } catch (e) {
       throw new ApiErrors(e.message, e.status);
     }
