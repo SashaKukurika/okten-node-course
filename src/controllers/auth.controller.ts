@@ -80,8 +80,9 @@ class AuthController {
     try {
       const { password } = req.body;
       const { tokenInfo } = req.res.locals;
+      const { token } = req.params;
 
-      await authService.setForgotPassword(password, tokenInfo._user_id);
+      await authService.setForgotPassword(password, tokenInfo._user_id, token);
 
       res.sendStatus(200);
     } catch (e) {
