@@ -36,7 +36,7 @@ class EmailService {
   }
 
   public async sendMail(
-    email: string,
+    email: string | string[],
     emailAction: EEmailAction,
     locals: Record<string, string> = {}
   ) {
