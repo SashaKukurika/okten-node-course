@@ -4,13 +4,14 @@ import mongoose from "mongoose";
 import { configs } from "./configs";
 import { cronRunner } from "./crons";
 import { ApiErrors } from "./errors";
-import { authRouter, userRouter } from "./routers";
+import { authRouter, carRouter, userRouter } from "./routers";
 
 const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/cars", carRouter);
 app.use("/users", userRouter);
 app.use("/auth", authRouter);
 

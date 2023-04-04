@@ -25,6 +25,12 @@ const userSchema = new Schema(
       type: Number,
       required: false,
     },
+    phone: {
+      type: String,
+      required: false,
+      trim: true,
+      lowercase: true,
+    },
     gender: {
       type: String,
       enum: EGenders,
@@ -38,6 +44,11 @@ const userSchema = new Schema(
   {
     versionKey: false,
     timestamps: true,
+    // statics: {
+    //   async findByName(name: string): Promise<IUser[]> {
+    //     return User.find({ name });
+    //   },
+    // },
   }
 );
 

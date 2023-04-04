@@ -40,7 +40,7 @@ router.post(
 );
 
 router.put(
-  "/password/forgot/:token",
+  `/password/forgot/:token`,
   authMiddleware.checkActionToken(EActionTokenType.forgot),
   authMiddleware.checkOldPassword,
   authController.setForgotPassword
@@ -54,7 +54,7 @@ router.post(
 );
 
 router.put(
-  "/activate/:token",
+  `/activate/:token`,
   authMiddleware.checkActionToken(EActionTokenType.activate),
   authController.activate
 );
@@ -64,6 +64,5 @@ router.post(
   authMiddleware.checkRefreshToken,
   authController.refresh
 );
-router.post("/login");
 
 export const authRouter = router;
