@@ -11,7 +11,7 @@ export interface IUser {
 }
 
 export interface IUserMethods {
-  nameWithSurname(): void;
+  nameWithAge(): void;
 }
 
 export interface IUserVirtuals {
