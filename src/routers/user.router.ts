@@ -4,8 +4,10 @@ import { userController } from "../controllers";
 import {
   authMiddleware,
   commonMiddleware,
+  fileMiddleware,
   userMiddleware,
 } from "../middlewares";
+import { UserValidator } from "../validators";
 
 const router = Router();
 
@@ -22,6 +24,7 @@ router.put(
   "/:userId",
   authMiddleware.checkAccessToken,
   commonMiddleware.isIdValid("userId"),
+  commonMiddleware.isBodyValid(UserValidator.updateUser),
   userMiddleware.getByIdOrThrow,
   userController.update
 );
@@ -31,6 +34,15 @@ router.delete(
   commonMiddleware.isIdValid("userId"),
   userMiddleware.getByIdOrThrow,
   userController.delete
+);
+
+router.put(
+  "/:userId/avatar",
+  authMiddleware.checkAccessToken,
+  commonMiddleware.isIdValid("userId"),
+  fileMiddleware.isAvatarValid,
+  userMiddleware.getByIdOrThrow,
+  userController.uploadAvatar
 );
 
 export const userRouter = router;
