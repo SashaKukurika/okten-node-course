@@ -95,7 +95,7 @@ class UserController {
     next: NextFunction
   ): Promise<Response<IUser>> {
     try {
-      const { user: userEntity } = req.res.locals.user;
+      const userEntity = res.locals.user;
 
       const avatar = req.files.avatar as UploadedFile;
 
