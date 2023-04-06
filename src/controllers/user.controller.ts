@@ -93,12 +93,13 @@ class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response<void>> {
+  ): Promise<Response<IUser>> {
     try {
-      const { userId } = req.params;
+      const { user: userEntity } = req.res.locals.user;
+
       const avatar = req.files.avatar as UploadedFile;
 
-      const user = await userService.uploadAvatar(avatar, userId);
+      const user = await userService.uploadAvatar(avatar, userEntity);
 
       return res.status(201).json(user);
     } catch (e) {

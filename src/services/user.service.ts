@@ -57,15 +57,16 @@ class UserService {
       throw new ApiErrors(e.message, e.status);
     }
   }
-  public async uploadAvatar(
-    file: UploadedFile,
-    userId: string
-  ): Promise<IUser> {
+  public async uploadAvatar(file: UploadedFile, user: IUser): Promise<IUser> {
     try {
-      const filePath = await s3Service.uploadPhoto(file, "user", userId);
+      const filePath = await s3Service.uploadPhoto(file, "user", user._id);
+
+      if (user.avatar) {
+        await s3Service.deletePhoto(user.avatar);
+      }
 
       return await User.findByIdAndUpdate(
-        userId,
+        user._id,
         { avatar: filePath },
         { new: true }
       );
